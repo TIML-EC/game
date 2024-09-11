@@ -1,0 +1,177 @@
+<html><head><base href="https://skylanternwishes.com/" /><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Sky Lantern Festival</title><style>
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #001f3f, #000000);
+    color: #fff;
+    overflow: hidden;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.lantern {
+    position: absolute;
+    bottom: -150px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150"><path d="M10 0 L90 0 L100 112.5 L87.5 150 L12.5 150 L0 112.5 Z" fill="orange" /><ellipse cx="50" cy="150" rx="37.5" ry="10" fill="rgba(255,165,0,0.6)" /></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    transition: all 0.5s ease;
+}
+.lantern:after {
+    content: "";
+    position: absolute;
+    width: 60%;
+    height: 10px;
+    background: radial-gradient(ellipse at center, rgba(255,165,0,0.8) 0%, rgba(255,165,0,0) 70%);
+    bottom: -5px;
+    left: 20%;
+    border-radius: 50%;
+    animation: flicker 0.5s infinite alternate;
+}
+@keyframes flicker {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+#wish {
+    width: 80%;
+    max-width: 300px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    padding: 10px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    resize: none;
+    transition: opacity 0.5s ease;
+}
+#release {
+    background: #ff9900;
+    border: none;
+    padding: 10px 20px;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.5s ease;
+    margin-bottom: 20px;
+}
+#release:hover {
+    background: #ffaa33;
+}
+.stars {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background: white;
+    z-index: -1;
+}
+@keyframes twinkle {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+@keyframes float {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(-120vh) rotate(var(--rotate)); }
+}
+</style></head><body>
+<div class="container">
+    <textarea id="wish" placeholder="寫上您的願望..."></textarea>
+    <button id="release">放飛天燈</button>
+</div>
+
+<script>
+function createStars() {
+    const container = document.querySelector('.container');
+    for (let i = 0; i < 100; i++) {
+        let star = document.createElement('div');
+        star.className = 'stars';
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.animation = `twinkle ${Math.random() * 3 + 2}s infinite`;
+        container.appendChild(star);
+    }
+}
+
+function releaseLanterns() {
+    const wish = document.getElementById('wish');
+    const releaseButton = document.getElementById('release');
+    
+    if (wish.value.trim() === '') {
+        alert('請在放飛天燈前寫下您的願望。');
+        return;
+    }
+    
+    // Hide wish textarea and release button
+    wish.style.opacity = '0';
+    releaseButton.style.opacity = '0';
+    
+    const lanternCount = Math.floor(Math.random() * 5) + 6; // Random number between 6 and 10
+    
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const baseLanternSize = Math.min(screenWidth, screenHeight) * 0.15; // 15% of the smaller screen dimension
+
+    for (let i = 0; i < lanternCount; i++) {
+        setTimeout(() => {
+            const lantern = document.createElement('div');
+            lantern.className = 'lantern';
+            const sizeVariation = Math.random() * 0.4 + 0.8; // 80% to 120% of base size
+            const size = baseLanternSize * sizeVariation;
+            lantern.style.width = `${size}px`;
+            lantern.style.height = `${size * 1.5}px`;
+            lantern.style.left = `${Math.random() * 80 + 10}%`;
+            lantern.style.setProperty('--rotate', `${Math.random() * 20 - 10}deg`);
+            lantern.style.animation = `float ${Math.random() * 10 + 15}s ease-in forwards`;
+            document.body.appendChild(lantern);
+            
+            // Add subtle size changes during float
+            setInterval(() => {
+                const newSize = size + (Math.random() * size * 0.1 - size * 0.05); // ±5% size change
+                lantern.style.width = `${newSize}px`;
+                lantern.style.height = `${newSize * 1.5}px`;
+            }, 1000);
+            
+            setTimeout(() => {
+                lantern.remove();
+            }, 25000);
+        }, i * 500);
+    }
+    
+    // Show wish textarea and release button after animation
+    setTimeout(() => {
+        wish.style.opacity = '1';
+        releaseButton.style.opacity = '1';
+        wish.value = ''; // Clear the wish text
+    }, 25000);
+}
+
+document.getElementById('release').addEventListener('click', releaseLanterns);
+
+createStars();
+
+// Recalculate lantern sizes on window resize
+window.addEventListener('resize', () => {
+    const lanterns = document.querySelectorAll('.lantern');
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const baseLanternSize = Math.min(screenWidth, screenHeight) * 0.15;
+
+    lanterns.forEach(lantern => {
+        const sizeVariation = Math.random() * 0.4 + 0.8;
+        const size = baseLanternSize * sizeVariation;
+        lantern.style.width = `${size}px`;
+        lantern.style.height = `${size * 1.5}px`;
+    });
+});
+</script>
+</body></html>
